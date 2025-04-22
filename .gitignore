@@ -1,0 +1,24 @@
+# byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# tests and coverage
+*.pytest_cache
+.coverage
+
+# database & logs
+*.db
+*.sqlite3
+*.log
+
+# venv
+.env*
+venv
+
+# other
+.vscode
+*.corp
+.DS_Store
+
+# app level exemptions 
+apps/static/assets/.temp

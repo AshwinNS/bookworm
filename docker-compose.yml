@@ -1,0 +1,29 @@
+services:
+  api:
+    container_name: bookworm
+    build:
+      dockerfile: docker/Dockerfile.api
+      args:
+        ENVIRONMENT_AREA: DEVELOPMENT
+    ports:
+      - 8000:8000
+    env_file:
+      - ./env/.env.dev
+    depends_on:
+      - db
+    volumes:
+      - ./:/usr/src/app/
+
+  db:
+    container_name: pg-db
+    restart: unless-stopped
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    env_file:
+      - ./env/.env.dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
