@@ -6,8 +6,7 @@
 > Do not check-in `.env*` files to the repo. `.env*` is already part of `.gitignore`.
 
 ## Development instance
-### location: env
-### File name: .env.dev
+### File: env/.env.dev
 
 ```
 # Django Variables
