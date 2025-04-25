@@ -1,14 +1,24 @@
 # Bookworm
 Bookworm is a book management api with AI recommendation system. It's easy to deploy, manage and scale.
 
-> [!IMPORTANT]  
-> For the application to deploy `.env*` file should be configured properly. Check [env/README.md](env/README.md) before proceeding.
+## Prerequisites
 
-## Development server spin-up
+Before you begin, you'll need to install one important software:
 
-The following commands will help developers to spin-up the bookworm app local dev server. Both `make` commands and `docker compose` commands are provided with description.
+### Install docker
+Docker is required to run the application, visit [docker for desktop](https://www.docker.com/products/docker-desktop/) and follow the steps.
 
-* Clean-up (remove created volumes and containers if any)
+> [!IMPORTANT]
+> For the application to deploy `.env.dev` file should be configured properly. Check [env/README.md](env/README.md) before proceeding.
+
+## Running the application
+
+The following commands will help developers to spin-up the bookworm app local dev server. You have two command options for running bookworm, using `Docker` or `Make`.
+
+### Option 1: Using Docker command
+
+#### 1. Clean-up (optional step, remove created volumes and containers if any)
+
 ```bash
 # docker command
 docker compose down -v
@@ -27,7 +37,7 @@ docker compose up -d --build
 docker exec -it bookworm-ai ollama pull <model-name>
 ```
 
-* Build the application.
+#### 2. Build application
 ```bash
 # docker command
 docker compose up -d --build
@@ -35,16 +45,31 @@ docker compose up -d --build
 # make command
 make build
 ```
-Build command will do the following in the background.
+
+This command will do the following in the background.
 1. Build docker image and deploy `api`, `db` and `ai` services.
 2. Start up the database.
-3. Run api using uvicorn.
+3. Run api using uvicorn in port `8000`.
 
-* Pull model from ollama
+#### 3. Pull model from ollama for `ai` service to use
 ```bash
-# run docker command only after containers are up
-docker exec -it bookworm-ai ollama pull <model-name>
-
-# make command, this will pull model mentioned in MODEL_NAME env var
-make pull-model
+docker exec -it bookworm-ai ollama pull llama3.2
 ```
+> [!NOTE]
+>  change the llm model name according to value provided in `.env.*` file default is set to `llama3.2`
+
+### Option 2: Using Make command
+
+#### 1. Clean-up (optional step)
+```bash
+make destroy
+```
+
+#### 2. Build and setup end to end application including local llm service.
+```bash
+make setup
+```
+
+> [!NOTE]
+> If faced with error check make targets to debug
+

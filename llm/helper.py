@@ -42,14 +42,15 @@ class OllamaClient:
 
     def chat(self, prompt: str, q: str):
         """
-        Sends a chat request to the Ollama client with the specified model and prompt.
+        Sends a chat request to the Ollama client using the specified prompt and user query.
         Args:
-            model_name (str): The name of the model to be used for the chat.
-            prompt (str): The prompt to be sent to the model.
+            prompt (str): The system prompt to guide the conversation.
+            q (str): The user's query or input message.
         Returns:
-            Response: The response from the Ollama client.
-        """
-        # Send a chat request to the Ollama client with the specified model and prompt
+            dict: A dictionary containing the response message content from the chat model.
+        """     
+        # Send a chat request to the Ollama client with the specified prompt and user query
+
         response = self.client.chat(
             model=self.model_name,
             messages=[
