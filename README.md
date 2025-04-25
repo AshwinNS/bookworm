@@ -46,7 +46,7 @@ docker compose up -d --build
 make build
 ```
 
-this command will do the following in the background.
+This command will do the following in the background.
 1. Build docker image and deploy `api`, `db` and `ai` services.
 2. Start up the database.
 3. Run api using uvicorn in port `8000`.
