@@ -18,13 +18,32 @@ The following commands will help developers to spin-up the bookworm app local de
 ### Option 1: Using Docker command
 
 #### 1. Clean-up (optional step, remove created volumes and containers if any)
+
 ```bash
+# docker command
 docker compose down -v
+
+# make command
+make destroy
+```
+
+* Build and setup end to end application including local ollama
+```bash
+# make command
+make setup
+
+# docker commands
+docker compose up -d --build
+docker exec -it bookworm-ai ollama pull <model-name>
 ```
 
 #### 2. Build application
 ```bash
+# docker command
 docker compose up -d --build
+
+# make command
+make build
 ```
 
 this command will do the following in the background.
@@ -53,3 +72,4 @@ make setup
 
 > [!NOTE]
 > If faced with error check make targets to debug
+

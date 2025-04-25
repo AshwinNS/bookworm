@@ -48,9 +48,9 @@ class OllamaClient:
             q (str): The user's query or input message.
         Returns:
             dict: A dictionary containing the response message content from the chat model.
-        """
-        
+        """     
         # Send a chat request to the Ollama client with the specified prompt and user query
+
         response = self.client.chat(
             model=self.model_name,
             messages=[

@@ -39,7 +39,7 @@ if ollama_client.model_name:
         ollama_client.is_model_available()
     except Exception as e:
         print(f"Model {ollama_client.model_name} is not available. Error: {e}")
-        raise("Please pull the model using 'make pull-model' command.")
+        raise RuntimeError("Please pull the model using 'make pull-model' command.")
 
 app.include_router(router=books.routers)
 app.include_router(router=reviews.routers)
