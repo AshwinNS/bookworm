@@ -20,33 +20,15 @@ The following commands will help developers to spin-up the bookworm app local de
 #### 1. Clean-up (optional step, remove created volumes and containers if any)
 
 ```bash
-# docker command
 docker compose down -v
-
-# make command
-make destroy
 ```
 
-* Build and setup end to end application including local ollama
+1. Build and setup application
 ```bash
-# make command
-make setup
-
-# docker commands
 docker compose up -d --build
-docker exec -it bookworm-ai ollama pull <model-name>
 ```
 
-#### 2. Build application
-```bash
-# docker command
-docker compose up -d --build
-
-# make command
-make build
-```
-
-This command will do the following in the background.
+This command will do the following.
 1. Build docker image and deploy `api`, `db` and `ai` services.
 2. Start up the database.
 3. Run api using uvicorn in port `8000`.
@@ -72,4 +54,3 @@ make setup
 
 > [!NOTE]
 > If faced with error check make targets to debug
-
