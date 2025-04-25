@@ -25,5 +25,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  ai:
+    container_name: bookworm-ai
+    image: alpine/ollama
+    ports:
+      - 5000:5000
+    env_file:
+      - ./env/.env.dev
+    depends_on:
+      - db
+    volumes:
+      - model_data:/root/.ollama/models
+
 volumes:
   postgres_data:
+  model_data:

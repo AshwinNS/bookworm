@@ -27,4 +27,8 @@ DATABASE=pgdb
 # Python Confs
 PYTHONDONTWRITEBYTECODE=1
 PYTHONUNBUFFERED=1
+
+# AI related
+# Get your model from https://ollama.com/library
+MODEL_NAME=llama3.2
 ```
