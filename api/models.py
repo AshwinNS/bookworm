@@ -31,8 +31,7 @@ class BookPublic(BookBase):
     id: int
     reviews: List["Review"] = []
 
-# Book schema and pydantic models - End
-
+# Review schema and pydantic models - Start
 # Review schema and pydantic models - Start
 
 class ReviewBase(SQLModel):
