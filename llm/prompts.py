@@ -1,20 +1,38 @@
+from api.models import ReviewPublic, BookPublic
 
-
-def generate_summary_prompt():
+def generate_summary_prompt(reviews: ReviewPublic, book: BookPublic):
     """
     Generates a summary of the book using the Ollama client.
     Returns:
         str: The prompt for generating a summary.
     """
-    # Example prompt for generating a summary
-    prompt = """You are an AI assistant and your task is to generate a summary of the book based on the provided information.
-                Please check the context provided by the user.
-                You should provide a concise and informative summary that captures the main themes and ideas of the book.
-                If the summary is not available, please mention that in the response.
-                Please do not include any personal opinions or interpretations.
-                Please provide the summary in a single paragraph without any bullet points or lists.
-                MAKE SURE TO INCLUDE THE BOOK TITLE AND AUTHOR NAME IN THE SUMMARY.
-                ENSURE THE SUMMARY IS MAXIMUM 100 WORDS LONG.
+    prompt = f"""Write a short summary of the story that is NOT EXCEEDING 150 words long. 
+                The summary should be based on its content and the rating provided by users. `DO NOT WRITE THE WHOLE STORY AGAIN OR MENTION TITLES`.
+                If you think story content cannot be summarized, then mention only about the user reviews and ratings.
+                The summary should be concise, capturing the main plot points and the overall sentiment reflected by the user ratings.
+
+                Story: {book.story}
+
+                User Ratings: {reviews}
+
+                Output Format:
+                Summary: <Provide the summary here>
+                Aggregated Rating: <Provide the aggregated rating here>
+            """
+
+    return prompt
+
+
+def generate_story_prompt():
+    """
+    Generates a prompt for the assistant to provide a story based on the book.
+    Returns:
+        str: The prompt for the assistant.
+    """
+    # Example prompt for generating a story
+    prompt = """Write a random story that is exactly 200 words long. 
+                The story can be about anything, but it should include unexpected twists and turns. Feel free to explore any genre, such as mystery, fantasy, or science fiction.
+                Ensure the story is engaging and has a clear beginning, middle, and end.
             """
 
     return prompt
@@ -27,6 +45,8 @@ def assistant_prompt():
         str: The prompt for the assistant.
     """
     # Example prompt for the assistant
-    prompt = "You are an AI assistant."
+    prompt = """You are an AI assistant. Who provides only details about books.
+            Apart from greeting and DON'T ANSWER ANYTHING ELSE, SAY `I'm not programmed to answer this, please ask about books`.    
+            """
 
     return prompt
