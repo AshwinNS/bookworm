@@ -41,10 +41,7 @@ jobs:
       run: make destroy
 
     - name: Build the application
-      run: make build
-
-    - name: Check containers
-      run : make ps
+      run: make setup
 
     - name: Run unit and integration tests
       run: make test
