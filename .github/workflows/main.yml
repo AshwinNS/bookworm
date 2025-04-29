@@ -16,7 +16,24 @@ jobs:
       uses: docker/setup-docker-action@v4.3.0
       with:
         version: v24.0.9
-          
+
+    - name: 'Create env file'
+      run: |
+        touch env/.env.dev
+        echo DEBUG=1 >> env/.env.dev
+        echo POSTGRES_PASSWORD=Hfj0Of234fG3jvkfja >> env/.env.dev
+        echo ENVIRONMENT_AREA=DEVELOPMENT >> env/.env.dev
+        echo POSTGRES_DB=books >> env/.env.dev
+        echo POSTGRES_TEST_DB=TEST >> env/.env.dev
+        echo SQL_HOST=db >> env/.env.dev
+        echo SQL_PORT=5432 >> env/.env.dev
+        echo POSTGRES_USER=postgres >> env/.env.dev
+        echo DB_ENGINE=postgresql >> env/.env.dev
+        echo DATABASE=pgdb >> env/.env.dev
+        echo PYTHONDONTWRITEBYTECODE=1 >> env/.env.dev
+        echo PYTHONUNBUFFERED=1 >> env/.env.dev
+        echo MODEL_NAME=llama3.2 >> env/.env.dev
+        cat env/.env.dev
 
     - name: Cleanup the environment
       run: make destroy
