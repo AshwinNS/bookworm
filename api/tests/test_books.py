@@ -50,7 +50,7 @@ def test_get_books_success(client: TestClient):
     assert isinstance(response.json(), list)
 
 
-def test_get_book_by_id_success(client: TestClient):
+def test_get_book_by_id_success(session: Session, client: TestClient, monkeypatch):
     """
     Test the successful retrieval of a book by its ID.
     This test performs the following steps:
@@ -59,7 +59,10 @@ def test_get_book_by_id_success(client: TestClient):
     3. Retrieves the book using the GET endpoint with the extracted ID.
     4. Asserts that the response status code is 200 (OK).
     5. Verifies that the retrieved book's details match the original data.
-    """   
+    """
+    mock_generate_story = MagicMock()
+    monkeypatch.setattr("api.routers.books.generate_story", mock_generate_story)
+
     book_data = {
         "title": "1984",
         "author": "Deepa Nishant",
@@ -68,6 +71,7 @@ def test_get_book_by_id_success(client: TestClient):
     }
     create_response = client.post("/books/", json=book_data)
     book_id = create_response.json()["id"]
+    mock_generate_story.assert_called_once_with(book_id, session)
 
     # Retrieve the book by ID
     response = client.get(f"/books/{book_id}")
@@ -94,7 +98,7 @@ def test_get_book_by_id_not_found(client: TestClient):
     assert response.json()["detail"] == "Book not found"
 
 
-def test_admin_update_book_success(client: TestClient, mock_admin_user):
+def test_admin_update_book_success(session: Session, client: TestClient, mock_admin_user, monkeypatch):
     """
     Test case for successfully updating a book as an admin user.
 
@@ -107,6 +111,8 @@ def test_admin_update_book_success(client: TestClient, mock_admin_user):
     3. Assert that the response status code is 200.
     4. Assert that the updated book's title matches the new value.
     """
+    mock_generate_story = MagicMock()
+    monkeypatch.setattr("api.routers.books.generate_story", mock_generate_story)
 
     book_data = {
         "title": "Aarachar",
@@ -116,6 +122,7 @@ def test_admin_update_book_success(client: TestClient, mock_admin_user):
     }
     create_response = client.post("/books/", json=book_data)
     book_id = create_response.json()["id"]
+    mock_generate_story.assert_called_once_with(book_id, session)
 
     # Update the book
     updated_data = {
@@ -132,7 +139,7 @@ def test_admin_update_book_success(client: TestClient, mock_admin_user):
     assert data["title"] == "Aarachar (Updated)"
 
 
-def test_user_update_book_failure(client: TestClient, mock_user):
+def test_user_update_book_failure(session: Session, client: TestClient, mock_user, monkeypatch):
     """
     Test case for updating a book with insufficient permissions.
 
@@ -144,7 +151,8 @@ def test_user_update_book_failure(client: TestClient, mock_user):
     3. Assert that the response status code is 403 (Forbidden).
     4. Assert that the response contains the correct error message indicating insufficient permissions.
     """
-
+    mock_generate_story = MagicMock()
+    monkeypatch.setattr("api.routers.books.generate_story", mock_generate_story)
     # Create a book to test update
     book_data = {
         "title": "Aarachar",
@@ -154,6 +162,7 @@ def test_user_update_book_failure(client: TestClient, mock_user):
     }
     create_response = client.post("/books/", json=book_data)
     book_id = create_response.json()["id"]
+    mock_generate_story.assert_called_once_with(book_id, session)
 
     # Update the book
     updated_data = {
@@ -193,7 +202,7 @@ def test_update_book_not_found(client: TestClient, mock_admin_user):
     assert response.json()["detail"] == "Book not found"
 
 
-def test_admin_delete_book_success(client: TestClient, mock_admin_user):
+def test_admin_delete_book_success(session: Session, client: TestClient, mock_admin_user, monkeypatch):
     """
     Test case for successfully deleting a book as an admin user.
     This test verifies that an admin user can delete a book from the system
@@ -206,7 +215,9 @@ def test_admin_delete_book_success(client: TestClient, mock_admin_user):
     4. Assert that the response status code is 200.
     5. Assert that the response message confirms successful deletion of the book.
     """
-    
+    mock_generate_story = MagicMock()
+    monkeypatch.setattr("api.routers.books.generate_story", mock_generate_story)
+
     book_data = {
         "title": "The Catcher in the Rye",
         "author": "J.D. Salinger",
@@ -215,6 +226,7 @@ def test_admin_delete_book_success(client: TestClient, mock_admin_user):
     }
     create_response = client.post("/books/", json=book_data)
     book_id = create_response.json()["id"]
+    mock_generate_story.assert_called_once_with(book_id, session)
 
     # Delete the book
     response = client.delete(
@@ -225,7 +237,7 @@ def test_admin_delete_book_success(client: TestClient, mock_admin_user):
     assert response.json() == f"Book with ID {book_id} has been deleted successfully."
 
 
-def test_user_delete_book_failure(client: TestClient, mock_user):
+def test_user_delete_book_failure(session: Session, client: TestClient, mock_user, monkeypatch):
     """
     Test case for attempting to delete a book without proper permissions.
     This test verifies that a user without the necessary permissions cannot delete a book.
@@ -241,7 +253,9 @@ def test_user_delete_book_failure(client: TestClient, mock_user):
     The API should return a 403 status code and a "You do not have permission to delete this book."
     error message.
     """
-    
+    mock_generate_story = MagicMock()
+    monkeypatch.setattr("api.routers.books.generate_story", mock_generate_story)
+
     book_data = {
         "title": "The Catcher in the Rye",
         "author": "J.D. Salinger",
@@ -250,6 +264,7 @@ def test_user_delete_book_failure(client: TestClient, mock_user):
     }
     create_response = client.post("/books/", json=book_data)
     book_id = create_response.json()["id"]
+    mock_generate_story.assert_called_once_with(book_id, session)
 
     # Delete the book
     response = client.delete(

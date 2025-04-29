@@ -51,11 +51,11 @@ pull-model:
 		exit 1; \
 	fi; \
 	
-	docker exec -it bookworm-ai ollama pull $$MODEL_NAME
+	docker exec -i bookworm-ai ollama pull $$MODEL_NAME
 test:
 	@echo "Running tests..."
 	@if ! docker ps --format '{{.Names}}' | grep -q '^bookworm-api$$'; then \
 		echo "Error: Container 'bookworm-api' is not running. Please start the container first."; \
 		exit 1; \
 	fi; \
-	docker exec -it bookworm-api pytest -v --disable-warnings api/tests
+	docker exec -i bookworm-api pytest -v --disable-warnings api/tests
