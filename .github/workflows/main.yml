@@ -43,5 +43,8 @@ jobs:
     - name: Build the application
       run: make build
 
+    - name: Check containers
+      run : make ps
+
     - name: Run unit and integration tests
       run: make test
