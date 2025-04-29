@@ -23,6 +23,13 @@ class BookCreate(BookBase):
     pass
 
 
+class BookUpdate(BookBase):
+    title: Optional[str] = None
+    author: Optional[str] = None
+    genre: Optional[str] = None
+    year_published: Optional[int] = None
+
+
 class BookPublic(BookBase):
     id: int
     reviews: List["Review"] = []
@@ -63,7 +70,6 @@ class ReviewPublic(ReviewBase):
 
 class UserBase(SQLModel):
     username: str
-    is_admin: bool = False
 
     @field_validator("username")
     def validate_username(cls, username):
@@ -73,8 +79,18 @@ class UserBase(SQLModel):
 
 class User(UserBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    is_admin: bool = False
     auth_token: Optional[str] = None
 
     __table_args__ = (UniqueConstraint("username", name="uq_username"),)
+
+
+class UserCreate(UserBase):
+    pass
+
+
+class UserPublic(UserBase):
+    id: int
+    auth_token: str
 
 # User schema and pydantic models - End

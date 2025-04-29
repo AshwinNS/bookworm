@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import select, Session
 
 from api.db import get_session
-from api.models import *
+from api.models import Book, Review, ReviewCreate, ReviewPublic
 
 routers = APIRouter()
 SessionDep = Annotated[Session, Depends(get_session)]

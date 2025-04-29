@@ -4,8 +4,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlmodel import select, Session
 
 from api.db import get_session
-from api.models import *
-from api.helper import generate_story
+from api.models import Book, BookCreate, BookPublic, BookUpdate
+from api.helper import generate_story, validate_auth_token
 
 routers = APIRouter()
 SessionDep = Annotated[Session, Depends(get_session)]
@@ -71,33 +71,39 @@ def get_book_by_id(book_id: int, session: SessionDep) -> Book:
 
 
 @routers.put("/books/{book_id}", response_model=BookPublic)
-def update_book(book_id: int, book: BookCreate, session: SessionDep) -> Book:
+def update_book(book_id: int, book: BookUpdate, session: SessionDep, current_user: str = Depends(validate_auth_token)) -> Book:
     """
     Update an existing book in the database.
     Args:
         book_id (int): The ID of the book to update.
-        book (BookCreate): An object containing the updated book data.
+        book (BookUpdate): An object containing the updated book data.
     Returns:
         Book: The updated book object.
     Raises:
         HTTPException: If the book with the given ID is not found (404).
     """
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="You do not have permission to update this book.")
     db_book = session.get(Book, book_id)
     if not db_book:
         raise HTTPException(status_code=404, detail="Book not found")
     
     # Update only the fields provided in the request
-    book_data = book.model_dump(exclude_unset=True)
-    for key, value in book_data.items():
-        setattr(db_book, key, value)
+    try:
+        book_data = book.model_dump(exclude_unset=True)
+        for key, value in book_data.items():
+            setattr(db_book, key, value)
+        session.commit()
+        session.refresh(db_book)
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(status_code=400, detail=f"Error updating book: {str(e)}")
     
-    session.commit()
-    session.refresh(db_book)
     return db_book
 
 
 @routers.delete("/books/{book_id}", response_model=str)
-def delete_book(book_id: int, session: SessionDep) -> str:
+def delete_book(book_id: int, session: SessionDep, current_user: str = Depends(validate_auth_token)) -> str:
     """
     Deletes a book from the database based on the provided book ID.
     Args:
@@ -107,7 +113,8 @@ def delete_book(book_id: int, session: SessionDep) -> str:
     Raises:
         HTTPException: If the book with the given ID is not found, raises a 404 error.
     """
-
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="You do not have permission to delete this book.")
     db_book = session.get(Book, book_id)
     if not db_book:
         raise HTTPException(status_code=404, detail="Book not found")

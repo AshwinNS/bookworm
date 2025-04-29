@@ -1,7 +1,37 @@
 from unittest.mock import MagicMock
 from fastapi.testclient import TestClient
 
+from api.helper import validate_auth_token
 from api.tests.conftest import *
+from pytest import fixture as py_fixture
+from api.models import UserCreate, User
+
+
+@py_fixture
+def admin_user(session):
+    admin = UserCreate(
+        username="mockadmin",
+    )
+    db_user = User.model_validate(admin)
+    session.add(db_user)
+    db_user.is_admin = True
+    db_user.auth_token = "mockadmin_token"
+    session.commit()
+    session.refresh(db_user)
+    return db_user
+
+@py_fixture
+def end_user(session):
+    user = UserCreate(
+        username="mock",
+    )
+    db_user = User.model_validate(user)
+    session.add(db_user)
+    db_user.is_admin = False
+    db_user.auth_token = "mock_token"
+    session.commit()
+    session.refresh(db_user)
+    return db_user
 
 
 def test_create_book_with_background_task(session: Session, client: TestClient, monkeypatch):
@@ -30,13 +60,13 @@ def test_create_book_with_background_task(session: Session, client: TestClient, 
     mock_generate_story.assert_called_once_with(data["id"], session)
 
 
-def test_get_books_success(session: Session, client: TestClient):
+def test_get_books_success(client: TestClient):
     response = client.get("/books/")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
 
 
-def test_get_book_by_id_success(session: Session, client: TestClient):
+def test_get_book_by_id_success(client: TestClient):
     # Create a book to test retrieval
     book_data = {
         "title": "1984",
@@ -57,13 +87,14 @@ def test_get_book_by_id_success(session: Session, client: TestClient):
     assert data["year_published"] == 1949
 
 
-def test_get_book_by_id_not_found(session: Session, client: TestClient):
+def test_get_book_by_id_not_found(client: TestClient):
     response = client.get("/books/9999")
     assert response.status_code == 404
     assert response.json()["detail"] == "Book not found"
 
 
-def test_update_book_success(session: Session, client: TestClient):
+def test_admin_update_book_success(client: TestClient, admin_user):
+
     # Create a book to test update
     book_data = {
         "title": "Aarachar",
@@ -76,31 +107,60 @@ def test_update_book_success(session: Session, client: TestClient):
 
     # Update the book
     updated_data = {
-        "title": "Aarachar (Updated)",
-        "author": "Kamala Das",
-        "genre": "Fiction",
-        "year_published": 1960
+        "title": "Aarachar (Updated)"
     }
-    response = client.put(f"/books/{book_id}", json=updated_data)
+    response = client.put(
+        f"/books/{book_id}",
+        json=updated_data,
+        headers={"Authorization": f"Bearer {admin_user.auth_token}"}
+    )
     data = response.json()
 
     assert response.status_code == 200
     assert data["title"] == "Aarachar (Updated)"
 
 
-def test_update_book_not_found(session: Session, client: TestClient):
+def test_user_update_book_failure(client: TestClient, end_user):
+
+    # Create a book to test update
+    book_data = {
+        "title": "Aarachar",
+        "author": "Kamala Das",
+        "genre": "Fiction",
+        "year_published": 1960
+    }
+    create_response = client.post("/books/", json=book_data)
+    book_id = create_response.json()["id"]
+
+    # Update the book
+    updated_data = {
+        "title": "Aarachar (Updated)"
+    }
+    response = client.put(
+        f"/books/{book_id}",
+        json=updated_data,
+        headers={"Authorization": f"Bearer {end_user.auth_token}"}
+    )
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == f"You do not have permission to update this book."
+
+
+def test_update_book_not_found(client: TestClient, admin_user):
     updated_data = {
         "title": "Nonexistent Book",
         "author": "Unknown",
         "genre": "Fiction",
         "year_published": 2000
     }
-    response = client.put("/books/9999", json=updated_data)
+    response = client.put("/books/9999",
+                         json=updated_data,
+                         headers={"Authorization": f"Bearer {admin_user.auth_token}"})
     assert response.status_code == 404
     assert response.json()["detail"] == "Book not found"
 
 
-def test_delete_book_success(session: Session, client: TestClient):
+def test_admin_delete_book_success(client: TestClient, admin_user):
     # Create a book to test deletion
     book_data = {
         "title": "The Catcher in the Rye",
@@ -112,12 +172,36 @@ def test_delete_book_success(session: Session, client: TestClient):
     book_id = create_response.json()["id"]
 
     # Delete the book
-    response = client.delete(f"/books/{book_id}")
+    response = client.delete(
+                    f"/books/{book_id}",
+                    headers={"Authorization": f"Bearer {admin_user.auth_token}"}
+                )
     assert response.status_code == 200
     assert response.json() == f"Book with ID {book_id} has been deleted successfully."
 
 
-def test_delete_book_not_found(session: Session, client: TestClient):
-        response = client.delete("/books/9999")
+def test_user_delete_book_failure(client: TestClient, end_user):
+    # Create a book to test deletion
+    book_data = {
+        "title": "The Catcher in the Rye",
+        "author": "J.D. Salinger",
+        "genre": "Fiction",
+        "year_published": 1951
+    }
+    create_response = client.post("/books/", json=book_data)
+    book_id = create_response.json()["id"]
+
+    # Delete the book
+    response = client.delete(
+                    f"/books/{book_id}",
+                    headers={"Authorization": f"Bearer {end_user.auth_token}"}
+                )
+    assert response.status_code == 403
+    assert response.json()["detail"] == "You do not have permission to delete this book."
+
+
+def test_delete_book_not_found(client: TestClient, admin_user):
+        response = client.delete("/books/9999",
+                                 headers={"Authorization": f"Bearer {admin_user.auth_token}"})
         assert response.status_code == 404
         assert response.json()["detail"] == "Book not found"

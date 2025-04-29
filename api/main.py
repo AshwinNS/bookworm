@@ -1,11 +1,10 @@
-from os import environ as os_environ
 from typing import Annotated
 from fastapi import Depends, FastAPI
 from sqlmodel import  Session
 
 from api.db import init_db, get_session
-from llm.helper import OllamaClient
-from api.routers import books, reviews, assistant
+from api.helper import init_app
+from api.routers import books, reviews, assistant, user
 
 
 app = FastAPI(
@@ -31,23 +30,13 @@ SessionDep = Annotated[Session, Depends(get_session)]
 @app.on_event('startup')
 def on_startup():
     init_db()
-    
-    # Check if the model name is set in the environment variables
-    model_name = os_environ.get("MODEL_NAME", "llama3.2")
-    ollama_client = OllamaClient(model_name)
-
-    # If the model name is not set, raise an error and exit
-    if ollama_client.model_name:
-        try:
-            ollama_client.is_model_available()
-        except Exception as e:
-            print(f"Model {ollama_client.model_name} is not available. Error: {e}")
-            raise RuntimeError("Please pull the model using 'make pull-model' command.")
+    init_app()
 
 
 app.include_router(router=books.routers, tags=["books"])
 app.include_router(router=reviews.routers, tags=["reviews"])
 app.include_router(router=assistant.routers, tags=["assistant"])
+app.include_router(router=user.routers, tags=["user"])
 
 
 @app.get("/health_check")
