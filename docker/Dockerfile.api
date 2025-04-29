@@ -18,6 +18,8 @@ RUN apk add --no-cache gcc musl-dev linux-headers && \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt
 
+ENV PYTHONPATH=$(pwd)
+
 COPY entrypoint.sh /usr/src/app/
 
 # ensure the entrypoint script is executable

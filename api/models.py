@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, UniqueConstraint
 from typing import Optional, List
 from pydantic import field_validator
 
@@ -10,18 +10,14 @@ class BookBase(SQLModel):
     genre: str
     year_published: int
     summary: Optional[str] = None
-
-    @field_validator("summary", mode="before")
-    def validate_summary(cls, data):
-        if not data:
-            return "No summary available."
-        return data
+    story: Optional[str] = Field(default=None, max_length=1500)
 
 
 class Book(BookBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     reviews: List["Review"] = Relationship(back_populates="book")
 
+    __table_args__ = (UniqueConstraint("title", "author", name="uq_title_author"),)
 
 class BookCreate(BookBase):
     pass
@@ -62,3 +58,23 @@ class ReviewPublic(ReviewBase):
     # book: BookPublic
 
 # Review schema and pydantic models - End
+
+# User schema and pydantic models - Start
+
+class UserBase(SQLModel):
+    username: str
+    is_admin: bool = False
+
+    @field_validator("username")
+    def validate_username(cls, username):
+        if len(username) < 3:
+            raise ValueError("Username must be at least 3 characters long.")
+        return username
+
+class User(UserBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    auth_token: Optional[str] = None
+
+    __table_args__ = (UniqueConstraint("username", name="uq_username"),)
+
+# User schema and pydantic models - End

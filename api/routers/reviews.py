@@ -8,9 +8,8 @@ from api.models import *
 routers = APIRouter()
 SessionDep = Annotated[Session, Depends(get_session)]
 
-# endpoints for reviews - Start
 
-@routers.get("/books/{book_id}/reviews/", response_model=List[ReviewPublic], tags=["reviews"])
+@routers.get("/books/{book_id}/reviews/", response_model=List[ReviewPublic])
 def get_reviews(book_id: int, session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100):
     """
     Retrieve a list of reviews for a specific book.
@@ -32,7 +31,7 @@ def get_reviews(book_id: int, session: SessionDep, offset: int = 0, limit: Annot
     return reviews
 
 
-@routers.post("/books/{book_id}/reviews/", response_model=ReviewPublic, tags=["reviews"])
+@routers.post("/books/{book_id}/reviews/", response_model=ReviewPublic)
 def create_or_update_review(book_id: int, review: ReviewCreate, session: SessionDep) -> Review:
     """
     Create or update a review for a specific book.
@@ -73,5 +72,3 @@ def create_or_update_review(book_id: int, review: ReviewCreate, session: Session
         session.commit()
         session.refresh(db_review)
         return db_review
-
-# endpoints for reviews - End

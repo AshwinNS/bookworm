@@ -1,14 +1,17 @@
 from typing import Annotated, List
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import select, Session
 
 from api.db import get_session
 from api.models import *
+from api.helper import generate_story
 
 routers = APIRouter()
 SessionDep = Annotated[Session, Depends(get_session)]
 
-@routers.get("/books/", response_model=List[BookPublic], tags=["books"])
+
+@routers.get("/books/", response_model=List[BookPublic])
 async def get_books(session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100):
     """
     Fetch list of books from the database with optional pagination.
@@ -23,8 +26,8 @@ async def get_books(session: SessionDep, offset: int = 0, limit: Annotated[int, 
     return heroes
 
 
-@routers.post("/books/", response_model=BookPublic, tags=["books"])
-def create_book(book: BookCreate, session: SessionDep) -> Book:
+@routers.post("/books/", response_model=BookPublic)
+def create_book(book: BookCreate, session: SessionDep, background_tasks: BackgroundTasks) -> Book:
     """
     Creates a new book record in the database.
     Args:
@@ -37,12 +40,20 @@ def create_book(book: BookCreate, session: SessionDep) -> Book:
         session.add(db_books)
         session.commit()
         session.refresh(db_books)
-        return db_books
+    
+    except IntegrityError as e:
+        session.rollback()
+        raise HTTPException(status_code=400, detail="A book with the same title and author already exists.")
     except Exception as e:
+        session.rollback()
         raise HTTPException(status_code=400, detail=f"Error creating book: {str(e)}")
+    
+    # Add the book creation task to the background tasks
+    background_tasks.add_task(generate_story, db_books.id, session)
+    return db_books
 
 
-@routers.get("/books/{book_id}", response_model=BookPublic, tags=["books"])
+@routers.get("/books/{book_id}", response_model=BookPublic)
 def get_book_by_id(book_id: int, session: SessionDep) -> Book:
     """
     Retrieve a book from the database by its ID.
@@ -59,7 +70,7 @@ def get_book_by_id(book_id: int, session: SessionDep) -> Book:
     return db_book
 
 
-@routers.put("/books/{book_id}", response_model=BookPublic, tags=["books"])
+@routers.put("/books/{book_id}", response_model=BookPublic)
 def update_book(book_id: int, book: BookCreate, session: SessionDep) -> Book:
     """
     Update an existing book in the database.
@@ -85,7 +96,7 @@ def update_book(book_id: int, book: BookCreate, session: SessionDep) -> Book:
     return db_book
 
 
-@routers.delete("/books/{book_id}", response_model=str, tags=["books"])
+@routers.delete("/books/{book_id}", response_model=str)
 def delete_book(book_id: int, session: SessionDep) -> str:
     """
     Deletes a book from the database based on the provided book ID.
@@ -104,5 +115,3 @@ def delete_book(book_id: int, session: SessionDep) -> str:
     session.delete(db_book)
     session.commit()
     return f"Book with ID {book_id} has been deleted successfully."
-
-# endpoints for books - End
