@@ -24,5 +24,5 @@ jobs:
     - name: Build the application
       run: make setup
 
-    - name: Run unit and integration test
+    - name: Run unit and integration tests
       run: make test
