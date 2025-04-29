@@ -6,7 +6,7 @@ else
 endif
 
 
-.PHONY: help build down destroy restart log ps pull-model 
+.PHONY: help build down destroy restart log ps pull-model test
 help:
 	@echo "Please use 'make <target>', where <target> is one of"
 	@echo ""
@@ -18,6 +18,7 @@ help:
 	@echo "  ps                    		View active containers"
 	@echo "  pull-model     			Pull the model from Ollama"
 	@echo "  setup                 		Build containers and pull Ollama model"
+	@echo "  test              			Run unit tests"
 	@echo ""
 
 setup: build pull-model
@@ -51,3 +52,10 @@ pull-model:
 	fi; \
 	
 	docker exec -it bookworm-ai ollama pull $$MODEL_NAME
+test:
+	@echo "Running tests..."
+	@if ! docker ps --format '{{.Names}}' | grep -q '^bookworm-api$$'; then \
+		echo "Error: Container 'bookworm-api' is not running. Please start the container first."; \
+		exit 1; \
+	fi; \
+	docker exec -it bookworm-api pytest -v --disable-warnings api/tests

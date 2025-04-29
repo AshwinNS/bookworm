@@ -1,6 +1,6 @@
 services:
   api:
-    container_name: bookworm
+    container_name: bookworm-api
     build:
       dockerfile: docker/Dockerfile.api
       args:
