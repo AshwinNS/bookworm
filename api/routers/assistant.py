@@ -33,9 +33,9 @@ def assistant(q: str, session: SessionDep):
 @routers.post("/books/{book_id}/summary")
 def generate_summary(book_id: int, session: SessionDep):
     db_book = session.get(Book, book_id)
-    reviews = db_book.reviews
     if not db_book:
         raise HTTPException(status_code=404, detail="Book not found")
+    reviews = db_book.reviews
     response = ollama_client.chat(prompts.generate_summary_prompt(reviews, db_book), '')
     if not response:
         raise HTTPException(status_code=500, detail="Failed to generate summary")
