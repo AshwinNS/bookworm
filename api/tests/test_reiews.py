@@ -1,10 +1,13 @@
+from unittest.mock import MagicMock
 from fastapi.testclient import TestClient
 
 from api.tests.conftest import *
 
 
 @pytest.fixture
-def create_mock_book(client: TestClient):
+def create_mock_book(client: TestClient, monkeypatch):
+    mock_generate_story = MagicMock()
+    monkeypatch.setattr("api.routers.books.generate_story", mock_generate_story)
     book_data = {
         "title": "Mock Book",
         "author": "Mock Author",

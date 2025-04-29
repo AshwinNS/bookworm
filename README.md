@@ -1,3 +1,5 @@
+[![Makefile CI](https://github.com/AshwinNS/bookworm/actions/workflows/main.yml/badge.svg)](https://github.com/AshwinNS/bookworm/actions/workflows/main.yml)
+
 # Bookworm
 Bookworm is a book management api with AI recommendation system. It's easy to deploy, manage and scale.
 
