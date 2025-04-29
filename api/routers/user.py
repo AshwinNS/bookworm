@@ -37,7 +37,7 @@ def create_user(user: UserCreate,session: SessionDep) -> User:
     try:
         db_user = User.model_validate(user)
         session.add(db_user)
-        db_user.auth_token = db_user.username + "_token"  # Example token generation
+        db_user.auth_token = db_user.username + "::token"  # Example token generation
         session.commit()
         session.refresh(db_user)
         return db_user

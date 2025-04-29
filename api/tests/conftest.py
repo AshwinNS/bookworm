@@ -7,6 +7,7 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from api.db import get_session
 from api.main import app
+from api.models import User, UserCreate
 
 TEST_DATABASE_URL = f"{os_environ.get("DB_ENGINE")}://{os_environ.get("POSTGRES_USER")}:{os_environ.get("POSTGRES_PASSWORD")}@{os_environ.get("SQL_HOST")}:{os_environ.get("SQL_PORT")}/{os_environ.get("POSTGRES_TEST_DB", "TEST")}"
 
@@ -34,3 +35,31 @@ def client_fixture(session: Session):
     client = TestClient(app)
     yield client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(name="mock_user")
+def mock_user(session):
+    user = UserCreate(
+        username="mock_user",
+    )
+    db_user = User.model_validate(user)
+    session.add(db_user)
+    db_user.is_admin = False
+    db_user.auth_token = f"{db_user.username}::token"
+    session.commit()
+    session.refresh(db_user)
+    return db_user
+
+
+@pytest.fixture(name="mock_admin_user")
+def mock_admin_user(session):
+    admin = UserCreate(
+        username="mock_admin",
+    )
+    db_user = User.model_validate(admin)
+    session.add(db_user)
+    db_user.is_admin = True
+    db_user.auth_token = f"{db_user.username}::token"
+    session.commit()
+    session.refresh(db_user)
+    return db_user

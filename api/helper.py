@@ -49,10 +49,10 @@ def validate_auth_token(authorization: str = Security(api_key_header), session: 
     
     token = authorization.strip().lower().replace("bearer ", "")
     try:
-        # Assuming the format "username:token" in the Authorization header
-        username, _ = token.split("_")
+        # Assuming the format "username::token" in the Authorization header
+        username, _ = token.split("::")
     except ValueError:
-        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'username_token'.")
+        raise HTTPException(status_code=401, detail="Invalid token format. Expected 'username::token'")
 
     db_user = session.exec(select(User).where(User.username == username)).first()
     if db_user and db_user.auth_token == token:

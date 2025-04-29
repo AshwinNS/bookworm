@@ -10,7 +10,7 @@ class BookBase(SQLModel):
     genre: str
     year_published: int
     summary: Optional[str] = None
-    story: Optional[str] = Field(default=None, max_length=1500)
+    story: Optional[str] = Field(default=None)
 
 
 class Book(BookBase, table=True):
