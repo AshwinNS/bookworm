@@ -41,7 +41,7 @@ jobs:
       run: make destroy
 
     - name: Build the application
-      run: make setup
+      run: make build
 
     - name: Run unit and integration tests
       run: make test
