@@ -41,7 +41,7 @@ def test_get_book_by_id_success(session: Session, client: TestClient):
     book_data = {
         "title": "1984",
         "author": "Deepa Nishant",
-        "genre": "Sience Fiction",
+        "genre": "Science Fiction",
         "year_published": 1949
     }
     create_response = client.post("/books/", json=book_data)
