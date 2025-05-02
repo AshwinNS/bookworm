@@ -64,6 +64,7 @@ def get_recommendations(session: SessionDep, ollama_client: Client):
                                     f'I have read/watched {watch_history_string}, recommend me books from this dataset {books_str}')
     else:
         print("Redis is not available.")
+        response = {"error": "Redis is unavailable. Recommendations cannot be fetched."}
         
     if not response:
         raise HTTPException(status_code=500, detail="Failed to fetch recommendations")
