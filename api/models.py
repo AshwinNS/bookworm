@@ -15,7 +15,7 @@ class BookBase(SQLModel):
 
 class Book(BookBase, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    reviews: List["Review"] = Relationship(back_populates="book")
+    reviews: List["Review"] = Relationship(back_populates="book", cascade_delete=True)
 
     __table_args__ = (UniqueConstraint("title", "author", name="uq_title_author"),)
 

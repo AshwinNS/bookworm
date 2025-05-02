@@ -35,13 +35,19 @@ jobs:
         echo PYTHONDONTWRITEBYTECODE=1 >> env/.env.dev
         echo PYTHONUNBUFFERED=1 >> env/.env.dev
         echo MODEL_NAME=llama3.2 >> env/.env.dev
+        echo REDIS_HOST=redis >> env/.env.dev
+        echo REDIS_PORT=6379 >> env/.env.dev
+        echo REDIS_DB=0 >> env/.env.dev
         cat env/.env.dev
 
     - name: Cleanup the environment
       run: make destroy
 
     - name: Build the application
-      run: make setup
+      run: make build
+
+    - name: pull model
+      run: make pull_model
 
     - name: Run unit and integration tests
       run: make test

@@ -1,7 +1,7 @@
 [![Makefile CI](https://github.com/AshwinNS/bookworm/actions/workflows/main.yml/badge.svg)](https://github.com/AshwinNS/bookworm/actions/workflows/main.yml)
 
 # Bookworm
-Bookworm is a book management api with AI recommendation system. It's easy to deploy, manage and scale.
+Bookworm is a FastAPI based book management api with AI recommendation system. It's easy to deploy, manage and scale.
 
 ## Prerequisites
 
@@ -31,16 +31,22 @@ docker compose up -d --build
 ```
 
 This command will do the following.
-1. Build docker image and deploy `api`, `db` and `ai` services.
+1. Build docker image and deploy `api`, `db`, `ai` and `redis` services.
 2. Start up the database.
 3. Run api using uvicorn in port `8000`.
 
-#### 3. Pull model from ollama for `ai` service to use
+#### 2. Pull model from ollama for `ai` service to use
 ```bash
 docker exec -it bookworm-ai ollama pull llama3.2
 ```
 > [!NOTE]
 >  change the llm model name according to value provided in `.env.*` file default is set to `llama3.2`
+
+#### 3. Load sample data to db (optional step)
+```bash
+docker exec -i pg-db psql -U postgres books < utils/data/db_loader.sql
+```
+
 
 ### Option 2: Using Make command
 
@@ -55,4 +61,4 @@ make setup
 ```
 
 > [!NOTE]
-> If faced with error check make targets to debug
+> `make setup` is a collection of 3 targets. It `builds` the application first, the `pull-model` downloads the llm from the ollama hub and finally `load_data` load the db with some books data. Additionally a `books_admin` user also will be added out of the box.

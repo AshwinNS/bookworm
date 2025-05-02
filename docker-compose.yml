@@ -36,7 +36,14 @@ services:
       - db
     volumes:
       - model_data:/root/.ollama/models
-
+  redis:
+    container_name: bookworm-redis
+    image: redis:7.4
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_db:/data
 volumes:
   postgres_data:
   model_data:
+  redis_db:
