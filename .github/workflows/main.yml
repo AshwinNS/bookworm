@@ -47,7 +47,7 @@ jobs:
       run: make build
 
     - name: pull model
-      run: make pull_model
+      run: make pull-model
 
     - name: Run unit and integration tests
       run: make test
