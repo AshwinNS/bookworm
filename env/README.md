@@ -28,6 +28,12 @@ DATABASE=pgdb
 PYTHONDONTWRITEBYTECODE=1
 PYTHONUNBUFFERED=1
 
+# Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_DB=0
+REDIS_PASSWORD=
+
 # AI related
 # Get your model from https://ollama.com/library
 MODEL_NAME=llama3.2

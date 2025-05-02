@@ -1,3 +1,4 @@
+import json
 from typing import Annotated, List
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.exc import IntegrityError
@@ -5,9 +6,10 @@ from sqlmodel import select, Session
 
 from api.db import get_session
 from api.models import Book, BookCreate, BookPublic, BookUpdate
-from api.helper import generate_story, validate_auth_token
+from api.helper import generate_story, validate_auth_token, RedisClient
 
 routers = APIRouter()
+redis = RedisClient().get_client()
 SessionDep = Annotated[Session, Depends(get_session)]
 
 
@@ -67,6 +69,21 @@ def get_book_by_id(book_id: int, session: SessionDep) -> Book:
     db_book = session.get(Book, book_id)
     if not db_book:
         raise HTTPException(status_code=404, detail="Book not found")
+    
+    # update the redis cache when user checkout any book
+    if redis.ping():
+        watch_key = 'book_title:watch'
+        title = db_book.title
+        genre = db_book.genre
+        field_key = f"{title}::{genre}"
+        watched = redis.hmget(watch_key, [field_key])
+        if watched:
+            redis.hincrby(watch_key, field_key, 1)
+        else:
+            redis.hset(watch_key, field_key, 1)
+    else:
+        print("Redis is not available.")
+
     return db_book
 
 

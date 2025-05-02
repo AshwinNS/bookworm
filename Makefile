@@ -19,14 +19,17 @@ help:
 	@echo "  pull-model     			Pull the model from Ollama"
 	@echo "  setup                 		Build containers and pull Ollama model"
 	@echo "  test              			Run unit tests"
+	@echo "  load_data         			Load data into the database"
 	@echo ""
 
-setup: build pull-model
+setup: build pull-model load_data
 	@echo "Running build target..."
 	@make build
 	@echo "Running pull-model target..."
 	@make pull-model
 	@echo "Setup complete."
+	@make load_data
+	@echo "Data loaded into the database."
 build:
 	docker compose up -d --build
 down:
@@ -59,3 +62,11 @@ test:
 		exit 1; \
 	fi; \
 	docker exec -i bookworm-api pytest -v --disable-warnings api/tests
+load_data:
+	@echo "Loading data into the database..."
+	@if ! docker ps --format '{{.Names}}' | grep -q '^pg-db$$'; then \
+		echo "Error: Container 'bookworm-api' is not running. Please start the container first."; \
+		exit 1; \
+	fi; \
+	docker exec -i pg-db psql -U postgres books < utils/data/db_loader.sql
+	@echo "Loaded data into the database..."

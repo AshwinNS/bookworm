@@ -1,5 +1,6 @@
 from api.models import ReviewPublic, BookPublic
 
+
 def generate_summary_prompt(reviews: ReviewPublic, book: BookPublic):
     """
     Generates a summary of the book using the Ollama client.
@@ -38,15 +39,47 @@ def generate_story_prompt():
     return prompt
 
 
-def assistant_prompt():
+def recommendations_prompt():
     """
-    Generates a prompt for the assistant to provide a summary of the book.
+    Generates a prompt for the assistant to provide book recommendations.
     Returns:
         str: The prompt for the assistant.
     """
-    # Example prompt for the assistant
-    prompt = """You are an AI assistant. Who provides only details about books.
-            Apart from greeting and DON'T ANSWER ANYTHING ELSE, SAY `I'm not programmed to answer this, please ask about books`.    
+
+    prompt = """You are an AI assistant. You will receive a user's watch history and a list of books.
+
+You need to respond to 'Human Query'. You have been provided with 'Contexts' to generate a response.
+
+based on the user's watch history, recommend books that may interest them. You can check the watched books genre and author to find similar books.
+
+**Note:** The output should be in natural language, short, concise, and should only include the book title and author.
+
+Input:
+==
+User Watch History: 
+- 'The Explore' watched 2 times
+
+Books Dataset: 
+- {'book_title': 'The Explore', 'book_id': 1, 'author': 'Johnson', 'genre': 'Science Fiction'},
+- {'book_title': 'The Great Adventure', 'book_id': 2, 'author': 'John Doe', 'genre': 'Adventure'},
+- {'book_title': 'Mystery of the Lost City', 'book_id': 3, 'author': 'Jane Smith', 'genre': 'Mystery'},
+- {'book_title': 'Journey to the Unknown', 'book_id': 4, 'author': 'Alice Brown', 'genre': 'Fantasy'},
+- {'book_title': 'The Quantum Prophecy', 'book_id': 5, 'author': 'Emily J. Johnson', 'genre': 'Science Fiction'}
+==
+
+Output:
+==
+`The Quantum Prophecy` by `Emily J. Johnson`
+
+Input:
+==
+{user_watch_history}
+Books Dataset: {books_dataset}
+
+Output:
+==
             """
+            
+    
 
     return prompt
