@@ -29,3 +29,4 @@ pytest-asyncio==0.26.0
 redis==5.2.1
 requests==2.32.3
 pytest_postgresql==7.0.1
+pq==1.9.1
