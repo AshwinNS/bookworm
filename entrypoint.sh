@@ -13,7 +13,7 @@ fi
 
 echo "Starting api service in...: $ENVIRONMENT_AREA"
 if [ "$ENVIRONMENT_AREA" = "DEVELOPMENT" ]; then
-    uvicorn api.main:app --port 8000 --host 0.0.0.0 --reload
+    uvicorn src:app --port 8000 --host 0.0.0.0 --reload
 else
     echo "Invalid ENVIRONMENT_AREA value. Please set it to DEVELOPMENT, PRODUCTION, or STAGING."
     exit 1
