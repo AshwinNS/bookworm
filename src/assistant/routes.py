@@ -49,7 +49,7 @@ async def generate_summary(book_id: int, ollama_client: Client, session: Session
     response = await ollama_client.chat(prompts.generate_summary_prompt(reviews, db_book), '')
     if not response:
         raise HTTPException(status_code=500, detail="Failed to generate summary")
-    # # Update the book with the generated summary
+    # Update the book with the generated summary
     summary = response.get("response", "")
     if summary.startswith("Summary:"):
         summary = summary.split("Summary:")[1].strip()
