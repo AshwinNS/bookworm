@@ -29,7 +29,7 @@ async def assistant(q: str, ollama_client: Client):
         response = await ollama_client.chat(prompts.assistant_prompt(), q)
         return response
     except Exception as e:
-        raise HTTPException(status_code=HTTPStatus.OK, detail=str(e))
+        raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @assistant_router.post("/books/{book_id}/summary")
