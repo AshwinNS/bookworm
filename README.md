@@ -62,3 +62,8 @@ make setup
 
 > [!NOTE]
 > `make setup` is a collection of 3 targets. It `builds` the application first, the `pull-model` downloads the llm from the ollama hub and finally `load_data` load the db with some books data. Additionally a `books_admin` user also will be added out of the box.
+
+### Features to be added
+
+- Use `uv` or `poetry` package for dependency management.
+- Implement `pgai` for book recommendation.
