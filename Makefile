@@ -6,7 +6,7 @@ else
 endif
 
 
-.PHONY: help build down destroy restart log ps pull-model test
+.PHONY: help build down destroy restart log ps pull-model test load_data
 help:
 	@echo "Please use 'make <target>', where <target> is one of"
 	@echo ""
@@ -61,7 +61,7 @@ test:
 		echo "Error: Container 'bookworm-api' is not running. Please start the container first."; \
 		exit 1; \
 	fi; \
-	docker exec -i bookworm-api pytest -v --disable-warnings api/tests
+	docker exec -i bookworm-api pytest -v --disable-warnings --asyncio-mode=auto  tests
 load_data:
 	@echo "Loading data into the database..."
 	@if ! docker ps --format '{{.Names}}' | grep -q '^pg-db$$'; then \

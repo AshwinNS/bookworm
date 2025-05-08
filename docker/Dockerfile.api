@@ -3,24 +3,25 @@ FROM python:3.12-alpine3.19
 ARG API_ENV
 
 ENV API_ENV=${API_ENV} \
-    PYTHONUNBUFFERED=1
-
-WORKDIR /usr/src/app
-
-ENV PIP_DEFAULT_TIMEOUT=100 \
+    APP_PATH=/usr/src/app \
+    PIP_DEFAULT_TIMEOUT=100 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR $APP_PATH
 
 # Copy only requirements, to cache them in docker layer
 COPY docker/setup/requirements.txt /tmp/requirements.txt
 
-RUN apk add --no-cache gcc musl-dev linux-headers && \
+RUN apk add --no-cache postgresql-dev gcc musl-dev linux-headers && \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt
 
-ENV PYTHONPATH=$(pwd)
+ENV PYTHONPATH=$APP_PATH
 
-COPY entrypoint.sh /usr/src/app/
+COPY entrypoint.sh $APP_PATH
 
 # ensure the entrypoint script is executable
 RUN sed -i 's/\r$//g' /usr/src/app/entrypoint.sh && \

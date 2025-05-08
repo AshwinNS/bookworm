@@ -26,7 +26,7 @@ jobs:
         echo POSTGRES_PASSWORD=Hfj0Of234fG3jvkfja >> env/.env.dev
         echo ENVIRONMENT_AREA=DEVELOPMENT >> env/.env.dev
         echo POSTGRES_DB=books >> env/.env.dev
-        echo POSTGRES_TEST_DB=TEST >> env/.env.dev
+        echo POSTGRES_TEST_DB=books_test >> env/.env.dev
         echo SQL_HOST=db >> env/.env.dev
         echo SQL_PORT=5432 >> env/.env.dev
         echo POSTGRES_USER=postgres >> env/.env.dev

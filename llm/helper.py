@@ -1,4 +1,4 @@
-from ollama import Client, ResponseError, pull
+from ollama import AsyncClient, ResponseError
 
 
 class OllamaClient:
@@ -9,10 +9,10 @@ class OllamaClient:
             host (str): The host address for the Ollama client.
         """
         self.model_name = model_name
-        self.client = Client(host=host)
+        self.client = AsyncClient(host=host)
 
 
-    def is_model_available(self) -> bool:
+    async def is_model_available(self) -> bool:
         """
         Checks if a model is available in the Ollama client.
         Args:
@@ -22,13 +22,13 @@ class OllamaClient:
         """
         is_available = True
         try:
-            _ = self.client.show(self.model_name)
+            await self.client.show(self.model_name)
         except ResponseError as e:
             is_available = False
         return is_available
 
 
-    def pull_model(self):
+    async def pull_model(self):
         """
         Pulls a model from the Ollama client.
         Args:
@@ -36,11 +36,10 @@ class OllamaClient:
         """
         
         # Pull the specified model from the Ollama client
-        pull(self.model_name)
+        await self.client.pull(self.model_name)
 
 
-
-    def chat(self, prompt: str, q: str):
+    async def chat(self, prompt: str, q: str):
         """
         Sends a chat request to the Ollama client using the specified prompt and user query.
         Args:
@@ -51,7 +50,7 @@ class OllamaClient:
         """     
         # Send a chat request to the Ollama client with the specified prompt and user query
 
-        response = self.client.chat(
+        response = await self.client.chat(
             model=self.model_name,
             messages=[
                 {

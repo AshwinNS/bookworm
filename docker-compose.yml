@@ -24,6 +24,14 @@ services:
       - ./env/.env.dev
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    entrypoint:
+      - "/bin/bash"
+      - "-c"
+      - |
+        docker-entrypoint.sh postgres &
+        until pg_isready -U postgres; do sleep 3; done &&
+        psql -U $POSTGRES_USER -d postgres -c 'CREATE DATABASE $POSTGRES_TEST_DB;' || true &&
+        wait
 
   ai:
     container_name: bookworm-ai
