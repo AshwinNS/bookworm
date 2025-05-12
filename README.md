@@ -1,7 +1,7 @@
 [![Makefile CI](https://github.com/AshwinNS/bookworm/actions/workflows/main.yml/badge.svg)](https://github.com/AshwinNS/bookworm/actions/workflows/main.yml)
 
 # Bookworm
-Bookworm is a FastAPI based book management api with AI recommendation system. It's easy to deploy, manage and scale.
+Bookworm is a FastAPI based book management api with AI recommendation system (postgres as database). It's easy to deploy, manage and scale. As the project is solo maintained `github copilot` is used for reviewer for basic code reviews.
 
 ## Prerequisites
 
